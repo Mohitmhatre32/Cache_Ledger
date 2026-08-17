@@ -67,7 +67,7 @@ export const Navbar: React.FC<NavbarProps> = ({
             <div>
               <div className="flex items-center gap-2">
                 <span className="font-extrabold tracking-tight text-lg text-[var(--foreground)] font-sans">
-                  CacheMind
+                  Cache Ledger
                 </span>
                 <span className="inline-flex items-center gap-1.5 rounded-[var(--radius)] bg-[var(--muted)] px-2 py-0.5 text-[11px] font-bold text-[var(--primary)] border border-[var(--border)]">
                   <span className="h-1.5 w-1.5 rounded-full bg-[var(--primary)] animate-pulse" />

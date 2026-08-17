@@ -79,7 +79,7 @@ export const CacheTable: React.FC<CacheTableProps> = ({
             className="bg-[var(--muted)] border border-[var(--border)] rounded-[var(--radius)] px-2.5 py-1.5 text-xs text-[var(--foreground)] focus:outline-none focus:border-[var(--ring)] cursor-pointer font-medium"
           >
             {categories.map((c) => (
-              <option key={c} value={c}>
+              <option key={c} value={c} className="bg-[var(--card)] text-[var(--foreground)] font-semibold">
                 Category: {c}
               </option>
             ))}

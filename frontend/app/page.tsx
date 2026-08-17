@@ -289,7 +289,7 @@ export default function Home() {
       <div className="min-h-screen bg-[#1C1917] text-[#F5F5F4] flex items-center justify-center font-sans">
         <div className="text-center space-y-4">
           <div className="animate-spin h-8 w-8 border-4 border-[var(--primary)] border-t-transparent rounded-full mx-auto" />
-          <p className="text-xs font-bold text-stone-400 uppercase tracking-widest">Hydrating CacheMind Dashboard...</p>
+          <p className="text-xs font-bold text-stone-400 uppercase tracking-widest">Hydrating Cache Ledger Dashboard...</p>
         </div>
       </div>
     );

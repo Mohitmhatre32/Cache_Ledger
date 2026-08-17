@@ -2,7 +2,7 @@ import type { Metadata } from 'next';
 import './globals.css';
 
 export const metadata: Metadata = {
-  title: 'CacheMind | Predictive Cloud-Cost Caching Engine',
+  title: 'Cache Ledger | Predictive Cloud-Cost Caching Engine',
   description:
     'Intelligent caching middleware that optimizes TTLs based on traffic patterns, reduces database requests, and calculates real-time cloud cost savings.',
 };

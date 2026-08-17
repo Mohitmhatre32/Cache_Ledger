@@ -43,8 +43,7 @@ export const BenchmarkView: React.FC<BenchmarkViewProps> = ({
         </div>
         <h2 className="text-xl font-bold text-[var(--foreground)]">Intelligent Dynamic TTL vs Static Fixed TTL</h2>
         <p className="text-xs text-[var(--muted-foreground)] mt-1 max-w-3xl">
-          Static caching (assigning a fixed 10m TTL to all items) results in cache thrashing, prematurely evicting
-          viral spikes while locking memory on cold products. CacheMind dynamically adapts TTLs to match real-time
+          viral spikes while locking memory on cold products. Cache Ledger dynamically adapts TTLs to match real-time
           demand velocity, drastically cutting database strain.
         </p>
       </div>

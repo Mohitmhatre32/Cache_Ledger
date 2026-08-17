@@ -40,17 +40,17 @@ export const Sidebar: React.FC<SidebarProps> = ({
   ];
 
   return (
-    <aside className="w-64 bg-[var(--card)] border-r border-[var(--border)] flex flex-col justify-between h-screen sticky top-0 shrink-0 font-sans transition-colors">
+    <aside className="w-64 bg-[var(--card)] border-r border-[var(--border)]/20 flex flex-col justify-between h-screen sticky top-0 shrink-0 font-sans transition-colors">
       {/* Top Section */}
       <div className="flex flex-col">
         {/* Brand Header */}
-        <div className="p-5 border-b border-[var(--border)] flex items-center gap-3">
+        <div className="p-5 border-b border-[var(--border)]/20 flex items-center gap-3">
           <div className="flex h-9 w-9 shrink-0 items-center justify-center rounded-[var(--radius)] bg-[var(--primary)] text-[var(--primary-foreground)] shadow-sm">
             <Zap className="h-5 w-5 fill-current" />
           </div>
           <div>
             <h1 className="font-extrabold tracking-tight text-base text-[var(--foreground)] leading-none">
-              CacheMind
+              Cache Ledger
             </h1>
             <span className="text-[10px] text-[var(--muted-foreground)] font-bold tracking-wide uppercase mt-1 block">
               Predictive Cache
@@ -59,7 +59,7 @@ export const Sidebar: React.FC<SidebarProps> = ({
         </div>
 
         {/* Engine Live Status Badge */}
-        <div className="px-5 py-4 border-b border-[var(--border)]/60 bg-[var(--muted)]/30">
+        <div className="px-5 py-4 border-b border-[var(--border)]/20 bg-[var(--muted)]/30">
           <div className="flex items-center justify-between">
             <span className="text-[11px] font-bold text-[var(--muted-foreground)] uppercase tracking-wider">
               Engine Status
@@ -104,7 +104,7 @@ export const Sidebar: React.FC<SidebarProps> = ({
       </div>
 
       {/* Bottom Footer Section */}
-      <div className="p-4 border-t border-[var(--border)] bg-[var(--muted)]/40 space-y-3">
+      <div className="p-4 border-t border-[var(--border)]/20 bg-[var(--muted)]/40 space-y-3">
         {/* Toggle Theme / Settings */}
         <div className="flex items-center gap-2">
           {/* Theme Toggler */}
@@ -138,7 +138,7 @@ export const Sidebar: React.FC<SidebarProps> = ({
 
         {/* Footer Brand Info */}
         <div className="text-[10px] text-[var(--muted-foreground)] text-center font-mono leading-none">
-          CacheMind v2.0.0
+           Cache Ledger v2.0.0
         </div>
       </div>
     </aside>

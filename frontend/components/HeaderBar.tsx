@@ -51,14 +51,14 @@ export const HeaderBar: React.FC<HeaderBarProps> = ({
   };
 
   return (
-    <header className="h-16 border-b border-[var(--border)] bg-[var(--card)]/90 backdrop-blur-md px-6 flex items-center justify-between gap-4 sticky top-0 z-30 font-sans transition-colors">
+    <header className="h-16 bg-[var(--background)]/90 backdrop-blur-md px-6 flex items-center justify-between gap-4 sticky top-0 z-30 font-sans transition-colors">
       {/* Title */}
       <div>
         <h2 className="text-sm font-black uppercase tracking-wider text-[var(--foreground)]">
           {getTabTitle()}
         </h2>
         <p className="text-[10px] text-[var(--muted-foreground)] font-semibold uppercase tracking-wider mt-0.5">
-          CacheMind Optimization Engine
+          Cache Ledger Optimization Engine
         </p>
       </div>
 
@@ -94,11 +94,11 @@ export const HeaderBar: React.FC<HeaderBarProps> = ({
             onChange={(e) => onSelectScenario(e.target.value as ScenarioType)}
             className="bg-transparent text-[var(--foreground)] border-none focus:outline-none cursor-pointer"
           >
-            <option value="NORMAL">Normal Traffic</option>
-            <option value="VIRAL_SURGE">Viral Spike 🔥</option>
-            <option value="PRODUCT_DECLINE">Decline ❄️</option>
-            <option value="CACHE_PRESSURE">Pressure ⚠️</option>
-            <option value="FLASH_SALE">Flash Sale ⚡</option>
+            <option value="NORMAL" className="bg-[var(--card)] text-[var(--foreground)] font-semibold">Normal Traffic</option>
+            <option value="VIRAL_SURGE" className="bg-[var(--card)] text-[var(--foreground)] font-semibold">Viral Spike 🔥</option>
+            <option value="PRODUCT_DECLINE" className="bg-[var(--card)] text-[var(--foreground)] font-semibold">Decline ❄️</option>
+            <option value="CACHE_PRESSURE" className="bg-[var(--card)] text-[var(--foreground)] font-semibold">Pressure ⚠️</option>
+            <option value="FLASH_SALE" className="bg-[var(--card)] text-[var(--foreground)] font-semibold">Flash Sale ⚡</option>
           </select>
         </div>
 
