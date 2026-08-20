@@ -4,6 +4,8 @@ import { cacheStore } from '@/lib/engine/cache-store';
 import { computeBenchmarkComparison } from '@/lib/engine/cost-engine';
 import { trafficSimulator } from '@/lib/engine/traffic-simulator';
 
+export const dynamic = 'force-dynamic';
+
 export async function GET() {
   try {
     const now = Date.now();

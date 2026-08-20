@@ -1,6 +1,8 @@
 import { NextRequest, NextResponse } from 'next/server';
 import { stateManager } from '@/lib/engine/state-manager';
 
+export const dynamic = 'force-dynamic';
+
 export async function GET(
   request: NextRequest,
   context: { params: Promise<{ id: string }> }

@@ -1,6 +1,6 @@
 'use client';
 
-import React, { useState, useEffect, useCallback } from 'react';
+import React, { useState, useEffect } from 'react';
 import { Sidebar } from '@/components/Sidebar';
 import { HeaderBar } from '@/components/HeaderBar';
 import { HeroCostCard } from '@/components/HeroCostCard';
@@ -24,6 +24,12 @@ import {
   BenchmarkComparison,
 } from '@/types';
 import { Cpu } from 'lucide-react';
+
+// Import local client-side engines directly
+import { stateManager } from '@/lib/engine/state-manager';
+import { trafficSimulator } from '@/lib/engine/traffic-simulator';
+import { cacheStore } from '@/lib/engine/cache-store';
+import { computeBenchmarkComparison } from '@/lib/engine/cost-engine';
 
 export default function Home() {
   const [mounted, setMounted] = useState<boolean>(false);
@@ -111,53 +117,55 @@ export default function Home() {
     setMounted(true);
   }, []);
 
-  // 1. Fetch initial products catalog
-  const fetchProducts = useCallback(async () => {
-    try {
-      const res = await fetch('/api/products');
-      const data = await res.json();
-      if (data.success) {
-        setProducts(data.products);
-      }
-    } catch (err) {
-      console.error('Failed to fetch products:', err);
-    }
-  }, []);
-
-  // 2. Poll metrics from backend
-  const fetchMetrics = useCallback(async () => {
-    try {
-      const res = await fetch('/api/metrics');
-      const data = await res.json();
-      if (data.success) {
-        setMetrics(data.metrics);
-        setHistory(data.history);
-        setProductStats(data.productStats);
-        setEvents(data.events);
-        setConfig(data.config);
-        setIsSimRunning(data.simulatorStatus?.isRunning ?? false);
-        setSimSpeed(data.simulatorStatus?.speedMultiplier ?? 1);
-        setCurrentScenario(data.simulatorStatus?.currentScenario ?? 'NORMAL');
-        if (data.benchmark) {
-          setBenchmark(data.benchmark);
-        }
-      }
-    } catch (err) {
-      console.error('Failed to poll metrics:', err);
-    }
-  }, []);
-
+  // Poll client-side StateManager directly (Zero server load)
   useEffect(() => {
     if (!mounted) return;
-    fetchProducts();
-    fetchMetrics();
 
-    const interval = setInterval(() => {
-      fetchMetrics();
-    }, 1200);
+    // Load initial products list from client-side stateManager map
+    setProducts(stateManager.getProducts());
 
-    return () => clearInterval(interval);
-  }, [mounted, fetchProducts, fetchMetrics]);
+    const updateReactState = () => {
+      const now = Date.now();
+      const clientMetrics = stateManager.getMetrics(now);
+      const clientConfig = stateManager.getConfig();
+      const clientHistory = stateManager.getHistory();
+      const clientStats = stateManager.getProductStats();
+      const clientEvents = stateManager.getEvents(25);
+      const simulatorStatus = trafficSimulator.getStatus();
+
+      // Compute A/B benchmark stats locally
+      const clientBenchmark = computeBenchmarkComparison(
+        clientMetrics.totalRequests,
+        clientMetrics.cacheHits,
+        clientMetrics.dbRequests,
+        clientMetrics.totalEvictions,
+        cacheStore.getMemoryUsageBytes(now),
+        clientConfig
+      );
+
+      setMetrics(clientMetrics);
+      setConfig(clientConfig);
+      setHistory([...clientHistory]);
+      setProductStats([...clientStats]);
+      setEvents([...clientEvents]);
+      setIsSimRunning(simulatorStatus.isRunning);
+      setSimSpeed(simulatorStatus.speedMultiplier);
+      setCurrentScenario(simulatorStatus.currentScenario);
+      setBenchmark(clientBenchmark);
+    };
+
+    // Update state immediately
+    updateReactState();
+
+    // Pull changes from local StateManager faster (600ms) for responsive visual meters
+    const timer = setInterval(() => {
+      updateReactState();
+    }, 600);
+
+    return () => {
+      clearInterval(timer);
+    };
+  }, [mounted]);
 
   // Toggle Dark Mode
   const toggleDarkMode = () => {
@@ -165,119 +173,50 @@ export default function Home() {
   };
 
   // Handler: Start/Stop Simulator
-  const handleToggleSimulator = async () => {
-    try {
-      const action = isSimRunning ? 'stop' : 'start';
-      await fetch('/api/simulator', {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ action, speed: simSpeed }),
-      });
-      setIsSimRunning(!isSimRunning);
-      fetchMetrics();
-    } catch (err) {
-      console.error('Failed to toggle simulator:', err);
+  const handleToggleSimulator = () => {
+    if (isSimRunning) {
+      trafficSimulator.stop();
+    } else {
+      trafficSimulator.start(simSpeed);
     }
   };
 
   // Handler: Change Speed
-  const handleSetSpeed = async (speed: number) => {
-    try {
-      setSimSpeed(speed);
-      await fetch('/api/simulator', {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ action: 'speed', speed }),
-      });
-      fetchMetrics();
-    } catch (err) {
-      console.error('Failed to set speed:', err);
-    }
+  const handleSetSpeed = (speed: number) => {
+    setSimSpeed(speed);
+    trafficSimulator.setSpeed(speed);
   };
 
   // Handler: Switch Scenario
-  const handleSelectScenario = async (scenario: ScenarioType) => {
-    try {
-      setCurrentScenario(scenario);
-      await fetch('/api/simulator', {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ action: 'scenario', scenario }),
-      });
-      fetchMetrics();
-    } catch (err) {
-      console.error('Failed to set scenario:', err);
-    }
+  const handleSelectScenario = (scenario: ScenarioType) => {
+    setCurrentScenario(scenario);
+    stateManager.setScenario(scenario);
   };
 
   // Handler: Trigger Burst
-  const handleTriggerBurst = async (count: number = 20, productId?: string) => {
-    try {
-      await fetch('/api/simulator', {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ action: 'burst', burstCount: count, productId }),
-      });
-      fetchMetrics();
-    } catch (err) {
-      console.error('Failed to trigger burst:', err);
-    }
+  const handleTriggerBurst = (count: number = 20, productId?: string) => {
+    trafficSimulator.runBurst(count, productId);
   };
 
   // Handler: Reset All
-  const handleReset = async () => {
-    try {
-      await fetch('/api/simulator', {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ action: 'reset' }),
-      });
-      setIsSimRunning(false);
-      fetchMetrics();
-    } catch (err) {
-      console.error('Failed to reset:', err);
-    }
+  const handleReset = () => {
+    trafficSimulator.stop();
+    stateManager.resetAll();
   };
 
   // Handler: Toggle Mode (Intelligent vs Static)
-  const handleToggleMode = async (mode: 'intelligent' | 'static') => {
-    try {
-      const newCfg = { ...config, cachingMode: mode };
-      setConfig(newCfg);
-      await fetch('/api/config', {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify(newCfg),
-      });
-      fetchMetrics();
-    } catch (err) {
-      console.error('Failed to update caching mode:', err);
-    }
+  const handleToggleMode = (mode: 'intelligent' | 'static') => {
+    stateManager.updateConfig({ cachingMode: mode });
   };
 
   // Handler: Save Settings
-  const handleSaveSettings = async (newConfig: CostConfig) => {
-    try {
-      setConfig(newConfig);
-      await fetch('/api/config', {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify(newConfig),
-      });
-      fetchMetrics();
-    } catch (err) {
-      console.error('Failed to save settings:', err);
-    }
+  const handleSaveSettings = (newConfig: CostConfig) => {
+    stateManager.updateConfig(newConfig);
   };
 
   // Handler: Manual Single Request on Product
-  const handleManualRequest = async (productId: string) => {
-    try {
-      await fetch(`/api/products/${productId}`);
-      fetchMetrics();
-    } catch (err) {
-      console.error('Failed to request product:', err);
-    }
+  const handleManualRequest = (productId: string) => {
+    stateManager.requestProduct(productId);
   };
 
   const inspectedProduct = products.find((p) => p.id === inspectProductId) || null;

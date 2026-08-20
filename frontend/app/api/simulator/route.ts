@@ -3,6 +3,8 @@ import { trafficSimulator } from '@/lib/engine/traffic-simulator';
 import { stateManager } from '@/lib/engine/state-manager';
 import { ScenarioType } from '@/types';
 
+export const dynamic = 'force-dynamic';
+
 export async function GET() {
   return NextResponse.json({
     success: true,

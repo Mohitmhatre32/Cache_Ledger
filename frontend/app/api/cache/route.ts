@@ -3,6 +3,8 @@ import { cacheStore } from '@/lib/engine/cache-store';
 import { stateManager } from '@/lib/engine/state-manager';
 import { evaluateEvictions } from '@/lib/engine/eviction-engine';
 
+export const dynamic = 'force-dynamic';
+
 export async function GET() {
   const now = Date.now();
   const entries = cacheStore.getEntries(now).map((e) => ({
